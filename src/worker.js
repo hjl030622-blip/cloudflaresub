@@ -351,6 +351,12 @@ function renderClash(nodes) {
     ...allGroupMembers,
     ``,
     `rules:`,
+    // Mihomo GeoX categories from MetaCubeX/meta-rules-dat.
+    `  - GEOSITE,private,DIRECT`,
+    `  - GEOIP,lan,DIRECT,no-resolve`,
+    `  - GEOSITE,cn,DIRECT`,
+    `  - GEOSITE,geolocation-!cn,节点选择`,
+    `  - GEOIP,CN,DIRECT`,
     `  - MATCH,节点选择`,
   ].join('\n');
 }

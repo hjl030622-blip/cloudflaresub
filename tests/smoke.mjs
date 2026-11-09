@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import worker from '../src/worker.js';
 import {
   decryptPayload,
   encryptPayload,
@@ -41,5 +42,29 @@ const secret = 'this-is-a-very-secret-key';
 const token = await encryptPayload({ nodes: expanded.nodes }, secret);
 const payload = await decryptPayload(token, secret);
 assert.equal(payload.nodes.length, 2);
+
+const clashResponse = await worker.fetch(
+  new Request('https://sub.example.com/sub/existing?target=clash'),
+  {
+    SUB_STORE: {
+      async get(key) {
+        assert.equal(key, 'sub:existing');
+        return JSON.stringify({ nodes: [{ ...expanded.nodes[0], host: 'edge.example.com' }] });
+      },
+    },
+  },
+);
+assert.equal(clashResponse.status, 200);
+assert.match(clashResponse.headers.get('content-type'), /^text\/yaml\b/);
+const clashOutput = await clashResponse.text();
+assert.match(clashOutput, /  - name: "节点选择"/);
+assert.deepEqual(clashOutput.split('\nrules:\n')[1]?.trimEnd().split('\n').map(line => line.slice(4)), [
+  'GEOSITE,private,DIRECT',
+  'GEOIP,lan,DIRECT,no-resolve',
+  'GEOSITE,cn,DIRECT',
+  'GEOSITE,geolocation-!cn,节点选择',
+  'GEOIP,CN,DIRECT',
+  'MATCH,节点选择',
+]);
 
 console.log('smoke test passed');
