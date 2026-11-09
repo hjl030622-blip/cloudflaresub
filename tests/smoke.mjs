@@ -61,6 +61,12 @@ assert.match(clashOutput, /  - name: "节点选择"/);
 assert.deepEqual(clashOutput.split('\nrules:\n')[1]?.trimEnd().split('\n').map(line => line.slice(4)), [
   'GEOSITE,private,DIRECT',
   'GEOIP,lan,DIRECT,no-resolve',
+  'GEOSITE,openai,节点选择',
+  'GEOSITE,github,节点选择',
+  'GEOSITE,google,节点选择',
+  'GEOSITE,youtube,节点选择',
+  'GEOSITE,telegram,节点选择',
+  'GEOIP,telegram,节点选择,no-resolve',
   'GEOSITE,cn,DIRECT',
   'GEOSITE,geolocation-!cn,节点选择',
   'GEOIP,CN,DIRECT',
